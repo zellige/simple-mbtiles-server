@@ -44,7 +44,7 @@ getTile conns z x y = do
   case res of
     Just a ->
       return a
-    _ ->
+    Nothing -> do
       Servant.throwError Servant.err404 {Servant.errBody = Errors.errorString "404" "No tiles found" "Try requesting a different tile."}
   where
     action =
