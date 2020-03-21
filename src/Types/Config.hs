@@ -8,14 +8,22 @@
 
 module Types.Config where
 
-import Options.Generic
+import qualified Options.Generic as OptionsGeneric
 
 data CommandLine w
   = CommandLine
-      { mbtilesFile :: w ::: Maybe FilePath <?> "Mbtiles file to serve"
+      { mbtilesFile :: w OptionsGeneric.::: Maybe FilePath OptionsGeneric.<?> "Mbtiles file to serve",
+        browser :: w OptionsGeneric.::: Bool OptionsGeneric.<?> "Start a browser with a simple map to view tiles"
       }
-  deriving (Generic)
+  deriving (OptionsGeneric.Generic)
 
-instance ParseRecord (CommandLine Wrapped)
+modifiers :: OptionsGeneric.Modifiers
+modifiers =
+  OptionsGeneric.defaultModifiers
+    { OptionsGeneric.shortNameModifier = OptionsGeneric.firstLetter
+    }
 
-deriving instance Show (CommandLine Unwrapped)
+instance OptionsGeneric.ParseRecord (CommandLine OptionsGeneric.Wrapped) where
+  parseRecord = OptionsGeneric.parseRecordWithModifiers modifiers
+
+deriving instance Show (CommandLine OptionsGeneric.Unwrapped)
