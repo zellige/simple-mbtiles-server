@@ -1,6 +1,38 @@
 module Lib
-    ( someFunc
-    ) where
+  ( startApp,
+  )
+where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+import qualified Database.Mbtiles as Mbtiles
+import qualified Network.Wai as Wai
+import qualified Network.Wai.Handler.Warp as Wai (run)
+import qualified Servant
+import qualified Web.Browser as Browser
+import qualified System.Exit as SystemExit
+import qualified Data.Text as Text
+import qualified Routes
+import qualified Controller
+
+debug :: Wai.Middleware
+debug app req resp = do
+  putStrLn "Request headers:"
+  print (Wai.requestHeaders req)
+  app req resp
+
+getTilesPool :: FilePath -> IO (Either Mbtiles.MBTilesError Mbtiles.MbtilesPool)
+getTilesPool file = do
+  Mbtiles.getMbtilesPool file
+
+startApp :: FilePath -> IO ()
+startApp mbtilesfile = do
+  mbTilesConnsOrError <- getTilesPool mbtilesfile
+  case mbTilesConnsOrError of
+    Left e -> do
+      putStrLn $ show e
+      SystemExit.exitWith (SystemExit.ExitFailure 2)
+    Right spatialConns -> do
+      b <- Browser.openBrowser $ Text.unpack "http://127.0.0.1" ++ ":" ++ "8765"
+      if b
+        then Wai.run 8765 $ debug $ Servant.serve Routes.api (Controller.server spatialConns)
+        else print "Failed to start browser"
+

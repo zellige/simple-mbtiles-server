@@ -24,9 +24,33 @@ dependencies:
 
 library:
   source-dirs: src
+  ghc-options:
+    - -fno-warn-deprecations
+    - -fprint-potential-instances
+    - -fwarn-unused-imports
+    - -fwarn-unused-binds
+    - -fwarn-tabs
+  default-extensions:
+    - OverloadedStrings
+    - TypeOperators
+    - DataKinds
+    - RecordWildCards
+    - DeriveGeneric
+  dependencies:
+    - servant-server
+    - wai
+    - warp
+    - open-browser
+    - optparse-generic
+    - bytestring
+    - text
+    - aeson
+    - neat-interpolation
+    - mtl
+    - mbtiles
 
 executables:
-  simple-mbtiles-server-exe:
+  simple-mbtiles-server:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -35,14 +59,4 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - simple-mbtiles-server
-
-tests:
-  simple-mbtiles-server-test:
-    main:                Spec.hs
-    source-dirs:         test
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - simple-mbtiles-server
+    - optparse-generic
