@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: eb5b0a4d2a67b5b9ecad140e217f2e037a9b28c42a1f46f8be810a2347632eba
+-- hash: 93ad40ba4389b584789a4cb8d5d2101f57a2a5399ee4fb10ebd2c0eabaa47ab1
 
 name:           simple-mbtiles-server
 version:        0.1.0.0
@@ -50,6 +50,7 @@ library
     , optparse-generic
     , servant-server
     , text
+    , unordered-containers
     , wai
     , warp
   default-language: Haskell2010

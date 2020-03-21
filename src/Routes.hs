@@ -5,6 +5,7 @@ module Routes where
 
 import qualified Data.ByteString as BSS
 import qualified Data.Proxy as Proxy
+import qualified Data.HashMap.Strict as HashMap
 import qualified Data.Text as Text
 import Servant
 
@@ -16,4 +17,6 @@ type API ="tiles"
     :> Capture "x" Int
     :> Capture "y" Text.Text
     :> Get '[OctetStream] BSS.ByteString
+    :<|> "metadata"
+    :> Get '[JSON] (HashMap.HashMap Text.Text Text.Text)
     :<|> Raw

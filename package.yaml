@@ -47,6 +47,7 @@ library:
     - aeson
     - neat-interpolation
     - mtl
+    - unordered-containers
     - mbtiles
 
 executables:

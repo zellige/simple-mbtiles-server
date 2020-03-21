@@ -6,4 +6,4 @@ import qualified Routes
 import qualified Servant
 
 server :: Mbtiles.MbtilesPool -> Servant.Server Routes.API
-server spatialConns = DB.tilesDB spatialConns Servant.:<|> Servant.serveDirectoryFileServer "."
+server spatialConns = DB.tilesDB spatialConns Servant.:<|> DB.metadataDB spatialConns Servant.:<|> Servant.serveDirectoryFileServer "static"

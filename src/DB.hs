@@ -6,6 +6,8 @@ module DB where
 import qualified Control.Monad.Trans as MonadTrans (liftIO)
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy.Char8 as ByteStringLazyChar8
+
+import qualified Data.HashMap.Strict as HashMap
 import qualified Data.Char as Char
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as TextEncoding
@@ -13,6 +15,12 @@ import qualified Data.Text.Read as TextRead
 import qualified Database.Mbtiles as Mbtiles
 import qualified Errors
 import qualified Servant
+
+metadataDB ::
+  Mbtiles.MbtilesPool ->
+    Servant.Handler (HashMap.HashMap Text.Text Text.Text)
+metadataDB conns =
+  Mbtiles.runMbtilesPoolT conns Mbtiles.getMetadata
 
 tilesDB ::
   Mbtiles.MbtilesPool ->
