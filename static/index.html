@@ -34,9 +34,9 @@ fetch('http://127.0.0.1:8765/metadata', {
 }).then(function(response){
     return response.json();
 }).then(function(metadata) {
-    console.log(metadata)
     let metadata_json = JSON.parse(metadata.json);
-    console.log(metadata_json)
+
+    let centre = metadata.center.split(',').slice(0,2).map(function (v) {return parseFloat(v)})
 
     let minzoom = parseInt(metadata.minzoom);
     let maxzoom = parseInt(metadata.maxzoom);
@@ -53,11 +53,10 @@ fetch('http://127.0.0.1:8765/metadata', {
         container: 'map',
         style: map_style,
         zoom: parseInt(metadata.minzoom),
-        center: [147.065735,-38.106466],
-        "minZoom": minzoom,
-        "maxZoom": maxzoom
+        center: centre,
+        "minZoom": minzoom
     });
-    
+
     map.on('load', function () {
         map.addSource('tiles', {
                 type: 'vector',
