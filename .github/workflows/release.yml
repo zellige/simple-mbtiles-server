@@ -13,7 +13,7 @@ jobs:
     - name: Get code
       uses: actions/checkout@v2
       with:
-        path: ./hastile
+        path: ./simple-mbtiles-server
 
     - name: Checkout zellige repo
       uses: actions/checkout@v2
@@ -39,7 +39,7 @@ jobs:
         cache-name: stack-work
       with:
         path: .stack-work/
-        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/hastile.cabal') }}${{ hashFiles('**/stack.yaml.lock') }}
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/simple-mbtiles-server.cabal') }}${{ hashFiles('**/stack.yaml.lock') }}
         restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
     
     - name: stack pre (setup, configure)
@@ -55,13 +55,13 @@ jobs:
     - name: create zip
       run: |
         stack install --stack-yaml stack-ci.yaml --local-bin-path .
-        zip -r hastile-linux.zip ./hastile
+        zip -r simple-mbtiles-server-linux.zip ./simple-mbtiles-server
 
     - name: Upload zip of binary
       uses: actions/upload-artifact@v1
       with:
-        name: hastile-linux
-        path: hastile-linux.zip
+        name: simple-mbtiles-server-linux
+        path: simple-mbtiles-server-linux.zip
   
   build_windows:
     runs-on: windows-latest
@@ -106,13 +106,13 @@ jobs:
       run: |
         echo "::add-path::C:\Program Files\PostgreSQL\11\bin"
         stack install --stack-yaml stack-ci.yaml --local-bin-path .
-        7z a hastile-windows.zip ./hastile.exe
+        7z a simple-mbtiles-server-windows.zip ./simple-mbtiles-server.exe
 
     - name: Upload zip of binary
       uses: actions/upload-artifact@v1
       with:
-        name: hastile-windows
-        path: hastile-windows.zip
+        name: simple-mbtiles-server-windows
+        path: simple-mbtiles-server-windows.zip
   
   build_macos:
     runs-on: macos-latest
@@ -164,13 +164,13 @@ jobs:
         export LDFLAGS="-L/usr/local/opt/postgresql@11/lib"
         export CPPFLAGS="-I/usr/local/opt/postgresql@11/include"
         stack install --stack-yaml stack-ci.yaml --local-bin-path .
-        zip -r hastile-macos.zip ./hastile
+        zip -r simple-mbtiles-server-macos.zip ./simple-mbtiles-server
 
     - name: Upload zip of binary
       uses: actions/upload-artifact@v1
       with:
-        name: hastile-macos
-        path: hastile-macos.zip
+        name: simple-mbtiles-server-macos
+        path: simple-mbtiles-server-macos.zip
 
   release:
     runs-on: ubuntu-latest    
@@ -179,17 +179,17 @@ jobs:
     - name: Download build artifacts
       uses: actions/download-artifact@v1
       with:
-        name: hastile-linux
+        name: simple-mbtiles-server-linux
 
     - name: Download build artifacts
       uses: actions/download-artifact@v1
       with:
-        name: hastile-windows
+        name: simple-mbtiles-server-windows
 
     - name: Download build artifacts
       uses: actions/download-artifact@v1
       with:
-        name: hastile-macos
+        name: simple-mbtiles-server-macos
 
     - name: Create Release
       id: create_release
@@ -217,8 +217,8 @@ jobs:
       with:
         body_path: ${{ github.workflow }}-CHANGELOG.txt
         files: |
-         ./hastile/hastile-linux.zip
-         ./hastile/hastile-windows.zip
-         ./hastile/hastile-macos.zip
+         ./simple-mbtiles-server/simple-mbtiles-server-linux.zip
+         ./simple-mbtiles-server/simple-mbtiles-server-windows.zip
+         ./simple-mbtiles-server/simple-mbtiles-server-macos.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
