@@ -1,0 +1,163 @@
+name: Build
+
+on: 
+  [push]
+
+jobs:
+  build_linux:
+    runs-on: ubuntu-latest    
+
+    steps:
+    - name: Get code
+      uses: actions/checkout@v2
+    
+    - name: Setup Stack
+      uses: mstksg/setup-stack@v2
+    
+    - name: Cache Stack downloads
+      uses: actions/cache@v1
+      env:
+        cache-name: cache-stack-modules-linux-v1
+      with:
+        path: /home/runner/.stack/
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/stack.yaml.lock') }}
+        restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
+
+    - name: Cache Stack Build
+      uses: actions/cache@v1
+      env:
+        cache-name: cache-stack-local-modules-linux-v1
+      with:
+        path: .stack-work/
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/hastile.cabal') }}${{ hashFiles('**/stack.yaml.lock') }}
+        restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
+    
+    - name: stack pre (setup, configure)
+      run: |
+        stack setup --stack-yaml stack-ci.yaml --no-terminal -j2
+        stack build --stack-yaml stack-ci.yaml --no-system-ghc --only-configure --no-terminal -j2
+
+    - name: stack compile and install
+      run: |
+        stack build  --stack-yaml stack-ci.yaml --no-terminal -j2
+        stack install  --stack-yaml stack-ci.yaml --no-terminal -j2
+
+    - name: create zip
+      run: |
+        stack install --stack-yaml stack-ci.yaml --local-bin-path .
+        zip -r hastile-linux.zip ./hastile
+
+    - name: Upload zip of binary
+      uses: actions/upload-artifact@v1
+      with:
+        name: hastile-linux
+        path: hastile-linux.zip
+  
+  build_windows:
+    runs-on: windows-latest
+    steps:
+    - name: Get code
+      uses: actions/checkout@v2
+    
+    - name: Setup Stack
+      uses: mstksg/setup-stack@v2
+    
+    - name: Cache Stack downloads
+      uses: actions/cache@v1
+      env:
+        cache-name: cache-stack-modules-windows-v1
+      with:
+        path: C:\Users\runneradmin\AppData\Roaming\stack
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/stack.yaml.lock') }}
+        restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
+
+    - name: Cache Stack Build
+      uses: actions/cache@v1
+      env:
+        cache-name: cache-stack-local-modules-windows-v1
+      with:
+        path: .stack-work/
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/evie.cabal') }}${{ hashFiles('**/stack.yaml.lock') }}
+        restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
+      
+    - name: stack pre (setup, configure)
+      run: |
+        echo "::add-path::C:\Program Files\PostgreSQL\11\bin"
+        stack setup --stack-yaml stack-ci.yaml --no-terminal -j2
+        stack build --stack-yaml stack-ci.yaml --no-system-ghc --only-configure --no-terminal -j2
+
+    - name: stack compile
+      run: |
+        echo "::add-path::C:\Program Files\PostgreSQL\11\bin"
+        stack build --stack-yaml stack-ci.yaml --no-terminal -j2
+
+    - name: create zip
+      shell: powershell -Command "& '{0}'"
+      run: |
+        echo "::add-path::C:\Program Files\PostgreSQL\11\bin"
+        stack install --stack-yaml stack-ci.yaml --local-bin-path .
+        7z a hastile-windows.zip ./hastile.exe
+
+    - name: Upload zip of binary
+      uses: actions/upload-artifact@v1
+      with:
+        name: hastile-windows
+        path: hastile-windows.zip
+  
+  build_macos:
+    runs-on: macos-latest
+    steps:
+    - name: Get code
+      uses: actions/checkout@v2
+    
+    - name: Setup Stack
+      uses: mstksg/setup-stack@v2
+    
+    - name: Cache Stack downloads
+      uses: actions/cache@v1
+      env:
+        cache-name: cache-stack-modules-macos-v2
+      with:
+        path: /Users/runner/.stack/
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/stack.yaml.lock') }}
+        restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
+
+    - name: Cache Stack Build
+      uses: actions/cache@v1
+      env:
+        cache-name: cache-stack-local-modules-macos-v2
+      with:
+        path: .stack-work/
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/evie.cabal') }}${{ hashFiles('**/stack.yaml.lock') }}
+        restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
+      
+    - name: stack pre (setup, configure)
+      timeout-minutes: 720
+      run: |
+        export PATH=/usr/local/opt/postgresql@11/bin:$PATH
+        export LDFLAGS="-L/usr/local/opt/postgresql@11/lib"
+        export CPPFLAGS="-I/usr/local/opt/postgresql@11/include"
+        stack setup --stack-yaml stack-ci.yaml --no-terminal -j2
+        stack build --stack-yaml stack-ci.yaml --no-system-ghc --only-configure --no-terminal -j2
+
+    - name: stack compile
+      timeout-minutes: 720
+      run: |
+        export PATH=/usr/local/opt/postgresql@11/bin:$PATH
+        export LDFLAGS="-L/usr/local/opt/postgresql@11/lib"
+        export CPPFLAGS="-I/usr/local/opt/postgresql@11/include"
+        stack build --stack-yaml stack-ci.yaml --no-terminal -j2
+
+    - name: create zip
+      run: |
+        export PATH=/usr/local/opt/postgresql@11/bin:$PATH
+        export LDFLAGS="-L/usr/local/opt/postgresql@11/lib"
+        export CPPFLAGS="-I/usr/local/opt/postgresql@11/include"
+        stack install --stack-yaml stack-ci.yaml --local-bin-path .
+        zip -r hastile-macos.zip ./hastile
+
+    - name: Upload zip of binary
+      uses: actions/upload-artifact@v1
+      with:
+        name: hastile-macos
+        path: hastile-macos.zip
