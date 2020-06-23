@@ -34,17 +34,17 @@ jobs:
     
     - name: stack pre (setup, configure)
       run: |
-        stack setup --stack-yaml stack-ci.yaml --no-terminal -j2
-        stack build --stack-yaml stack-ci.yaml --no-system-ghc --only-configure --no-terminal -j2
+        stack setup --no-terminal -j2
+        stack build --no-system-ghc --only-configure --no-terminal -j2
 
     - name: stack compile and install
       run: |
-        stack build  --stack-yaml stack-ci.yaml --no-terminal -j2
-        stack install  --stack-yaml stack-ci.yaml --no-terminal -j2
+        stack build  --no-terminal -j2
+        stack install  --no-terminal -j2
 
     - name: create zip
       run: |
-        stack install --stack-yaml stack-ci.yaml --local-bin-path .
+        stack install --local-bin-path .
         zip -r simple-mbtiles-server-linux.zip ./simple-mbtiles-server
 
     - name: Upload zip of binary
@@ -83,19 +83,19 @@ jobs:
     - name: stack pre (setup, configure)
       run: |
         echo "::add-path::C:\Program Files\PostgreSQL\11\bin"
-        stack setup --stack-yaml stack-ci.yaml --no-terminal -j2
-        stack build --stack-yaml stack-ci.yaml --no-system-ghc --only-configure --no-terminal -j2
+        stack setup --no-terminal -j2
+        stack build --no-system-ghc --only-configure --no-terminal -j2
 
     - name: stack compile
       run: |
         echo "::add-path::C:\Program Files\PostgreSQL\11\bin"
-        stack build --stack-yaml stack-ci.yaml --no-terminal -j2
+        stack build --no-terminal -j2
 
     - name: create zip
       shell: powershell -Command "& '{0}'"
       run: |
         echo "::add-path::C:\Program Files\PostgreSQL\11\bin"
-        stack install --stack-yaml stack-ci.yaml --local-bin-path .
+        stack install --local-bin-path .
         7z a simple-mbtiles-server-windows.zip ./simple-mbtiles-server.exe
 
     - name: Upload zip of binary
@@ -137,8 +137,8 @@ jobs:
         export PATH=/usr/local/opt/postgresql@11/bin:$PATH
         export LDFLAGS="-L/usr/local/opt/postgresql@11/lib"
         export CPPFLAGS="-I/usr/local/opt/postgresql@11/include"
-        stack setup --stack-yaml stack-ci.yaml --no-terminal -j2
-        stack build --stack-yaml stack-ci.yaml --no-system-ghc --only-configure --no-terminal -j2
+        stack setup --no-terminal -j2
+        stack build --no-system-ghc --only-configure --no-terminal -j2
 
     - name: stack compile
       timeout-minutes: 720
@@ -146,14 +146,14 @@ jobs:
         export PATH=/usr/local/opt/postgresql@11/bin:$PATH
         export LDFLAGS="-L/usr/local/opt/postgresql@11/lib"
         export CPPFLAGS="-I/usr/local/opt/postgresql@11/include"
-        stack build --stack-yaml stack-ci.yaml --no-terminal -j2
+        stack build --no-terminal -j2
 
     - name: create zip
       run: |
         export PATH=/usr/local/opt/postgresql@11/bin:$PATH
         export LDFLAGS="-L/usr/local/opt/postgresql@11/lib"
         export CPPFLAGS="-I/usr/local/opt/postgresql@11/include"
-        stack install --stack-yaml stack-ci.yaml --local-bin-path .
+        stack install --local-bin-path .
         zip -r simple-mbtiles-server-macos.zip ./simple-mbtiles-server
 
     - name: Upload zip of binary
