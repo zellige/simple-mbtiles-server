@@ -1,10 +1,10 @@
 name:                simple-mbtiles-server
-version:             0.1.0.0
-github:              "githubuser/simple-mbtiles-server"
-license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2020 Author name here"
+version:             0.0.1.0
+github:              "zellige/simple-mbtiles-server"
+license:             Apache 2.0
+author:              "Zellige"
+maintainer:          "ljnicol@users.noreply.github.com"
+copyright:           "2020 Zellige Organisation"
 
 extra-source-files:
 - README.md

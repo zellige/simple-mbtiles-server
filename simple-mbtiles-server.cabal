@@ -7,7 +7,7 @@ cabal-version: 1.12
 -- hash: 93ad40ba4389b584789a4cb8d5d2101f57a2a5399ee4fb10ebd2c0eabaa47ab1
 
 name:           simple-mbtiles-server
-version:        0.1.0.0
+version:        0.0.1.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/simple-mbtiles-server#readme>
 homepage:       https://github.com/githubuser/simple-mbtiles-server#readme
 bug-reports:    https://github.com/githubuser/simple-mbtiles-server/issues
