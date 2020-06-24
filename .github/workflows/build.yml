@@ -2,6 +2,8 @@ name: Build
 
 on: 
   push:
+    branches:
+    - '*'
     tags:
     - '!v*' # don't run build against tagged versions as release will run here.
 
