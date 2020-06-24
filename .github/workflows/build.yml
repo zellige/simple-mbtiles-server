@@ -82,19 +82,16 @@ jobs:
       
     - name: stack pre (setup, configure)
       run: |
-        echo "::add-path::C:\Program Files\PostgreSQL\11\bin"
         stack setup --no-terminal -j2
         stack build --no-system-ghc --only-configure --no-terminal -j2
 
     - name: stack compile
       run: |
-        echo "::add-path::C:\Program Files\PostgreSQL\11\bin"
         stack build --no-terminal -j2
 
     - name: create zip
       shell: powershell -Command "& '{0}'"
       run: |
-        echo "::add-path::C:\Program Files\PostgreSQL\11\bin"
         stack install --local-bin-path .
         7z a simple-mbtiles-server-windows.zip ./simple-mbtiles-server.exe
 
