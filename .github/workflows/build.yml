@@ -2,8 +2,8 @@ name: Build
 
 on: 
   push:
-    tags-ignore:
-    - 'v*' # don't run build against tagged versions as release will run here.
+    tags:
+    - '!v*' # don't run build against tagged versions as release will run here.
 
 jobs:
   build_linux:
