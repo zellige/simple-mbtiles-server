@@ -1,7 +1,9 @@
 name: Build
 
 on: 
-  [push]
+  push:
+    tags-ignore:
+    - 'v*' # don't run build against tagged versions as release will run here.
 
 jobs:
   build_linux:
@@ -29,7 +31,7 @@ jobs:
         cache-name: cache-stack-local-modules-linux-v1
       with:
         path: .stack-work/
-        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/simple-mbtiles-server.cabal') }}${{ hashFiles('**/stack.yaml.lock') }}
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.yaml') }}${{ hashFiles('**/stack.yaml.lock') }}
         restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
     
     - name: stack pre (setup, configure)
