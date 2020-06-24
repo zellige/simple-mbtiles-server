@@ -27,7 +27,7 @@ jobs:
     - name: Cache Stack downloads
       uses: actions/cache@v1
       env:
-        cache-name: stack-download
+        cache-name: cache-stack-modules-linux-v1
       with:
         path: /home/runner/.stack/
         key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/stack.yaml.lock') }}
@@ -36,7 +36,7 @@ jobs:
     - name: Cache Stack Build
       uses: actions/cache@v1
       env:
-        cache-name: stack-work
+        cache-name: cache-stack-local-modules-linux-v1
       with:
         path: .stack-work/
         key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/simple-mbtiles-server.cabal') }}${{ hashFiles('**/stack.yaml.lock') }}
@@ -75,7 +75,7 @@ jobs:
     - name: Cache Stack downloads
       uses: actions/cache@v1
       env:
-        cache-name: stack-download
+        cache-name: cache-stack-modules-windows-v1
       with:
         path: C:\Users\runneradmin\AppData\Roaming\stack
         key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/stack.yaml.lock') }}
@@ -84,7 +84,7 @@ jobs:
     - name: Cache Stack Build
       uses: actions/cache@v1
       env:
-        cache-name: stack-work
+        cache-name: cache-stack-local-modules-windows-v1
       with:
         path: .stack-work/
         key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/evie.cabal') }}${{ hashFiles('**/stack.yaml.lock') }}
@@ -126,7 +126,7 @@ jobs:
     - name: Cache Stack downloads
       uses: actions/cache@v1
       env:
-        cache-name: stack-download
+        cache-name: cache-stack-modules-macos-v2
       with:
         path: /Users/runner/.stack/
         key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/stack.yaml.lock') }}
@@ -135,7 +135,7 @@ jobs:
     - name: Cache Stack Build
       uses: actions/cache@v1
       env:
-        cache-name: stack-work
+        cache-name: cache-stack-local-modules-macos-v2
       with:
         path: .stack-work/
         key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/evie.cabal') }}${{ hashFiles('**/stack.yaml.lock') }}
