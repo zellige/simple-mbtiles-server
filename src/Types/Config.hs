@@ -9,6 +9,7 @@
 module Types.Config where
 
 import qualified Options.Generic as OptionsGeneric
+import qualified Data.Text as Text
 
 data CommandLine w
   = CommandLine
@@ -27,3 +28,5 @@ instance OptionsGeneric.ParseRecord (CommandLine OptionsGeneric.Wrapped) where
   parseRecord = OptionsGeneric.parseRecordWithModifiers modifiers
 
 deriving instance Show (CommandLine OptionsGeneric.Unwrapped)
+
+type ContentEncoding = Text.Text

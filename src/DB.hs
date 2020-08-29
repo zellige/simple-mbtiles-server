@@ -16,6 +16,7 @@ import qualified Database.Mbtiles as Mbtiles
 import qualified Errors
 import qualified Servant
 import qualified Data.Maybe as Maybe
+import qualified Types.Config as Config
 
 metadataDB ::
   Mbtiles.MbtilesPool ->
@@ -23,7 +24,7 @@ metadataDB ::
 metadataDB conns =
   Mbtiles.runMbtilesPoolT conns Mbtiles.getMetadata
 
-getTileEncoding :: Mbtiles.MbtilesPool -> IO Text.Text
+getTileEncoding :: Mbtiles.MbtilesPool -> IO Config.ContentEncoding
 getTileEncoding conns = do
     metadata <- Mbtiles.runMbtilesPoolT conns Mbtiles.getMetadata
     pure $ if pCOptionSet metadata then
@@ -46,14 +47,15 @@ lastGeneratorPc genOpts =
     a = map (Text.isInfixOf "-pC") (Text.splitOn ";" genOpts)
 
 tilesDB ::
+  Config.ContentEncoding ->
   Mbtiles.MbtilesPool ->
   Int ->
   Int ->
   Text.Text ->
   Servant.Handler (Servant.Headers '[Servant.Header "Content-Encoding" Text.Text] BS.ByteString)
-tilesDB conns z x stringY
+tilesDB contentEncoding conns z x stringY
   | (".mvt" `Text.isSuffixOf` stringY) || (".pbf" `Text.isSuffixOf` stringY) || (".vector.pbf" `Text.isSuffixOf` stringY) =
-    getAnything conns z x stringY
+    Servant.addHeader contentEncoding <$> (getAnything conns z x stringY)
   | otherwise = Servant.throwError $ Servant.err400 {Servant.errBody = "Unknown request: " <> ByteStringLazyChar8.fromStrict (TextEncoding.encodeUtf8 stringY)}
 
 getAnything ::
@@ -61,7 +63,7 @@ getAnything ::
   Int ->
   Int ->
   Text.Text ->
-  Servant.Handler (Servant.Headers '[Servant.Header "Content-Encoding" Text.Text] BS.ByteString)
+  Servant.Handler BS.ByteString
 getAnything conns z x stringY =
   case getY stringY of
     Left e -> Servant.throwError $ Servant.err400 {Servant.errBody = "Unknown request: " <> ByteStringLazyChar8.fromStrict (TextEncoding.encodeUtf8 stringY)}
@@ -69,15 +71,14 @@ getAnything conns z x stringY =
   where
     getY s = TextRead.decimal $ Text.takeWhile Char.isNumber s
 
-getTile :: Mbtiles.MbtilesPool -> Int -> Int -> Int -> Servant.Handler (Servant.Headers '[Servant.Header "Content-Encoding" Text.Text] BS.ByteString)
+getTile :: Mbtiles.MbtilesPool -> Int -> Int -> Int -> Servant.Handler BS.ByteString
 getTile conns z x y = do
   res <- MonadTrans.liftIO $ action
   case res of
     Just a ->
-      return (Servant.addHeader contentEncoding a)
+      return a
     Nothing -> do
       Servant.throwError Servant.err404 {Servant.errBody = Errors.errorString "404" "No tiles found" "Try requesting a different tile."}
   where
     action =
       Mbtiles.runMbtilesPoolT conns (Mbtiles.getTile (Mbtiles.Z z) (Mbtiles.X x) (Mbtiles.Y y))
-    contentEncoding = "gzip"

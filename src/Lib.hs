@@ -33,7 +33,8 @@ startApp mbtilesfile startBrowser = do
       SystemExit.exitWith (SystemExit.ExitFailure 2)
     Right spatialConns -> do
         contentEncoding <- DB.getTileEncoding spatialConns
-        putStrLn $ show contentEncoding
+        let
+          action = Wai.run 8765 $ debug $ Servant.serve Routes.api (Controller.server contentEncoding spatialConns)
         if startBrowser then do
             b <- Browser.openBrowser $ Text.unpack "http://127.0.0.1" ++ ":" ++ "8765"
             if b
@@ -41,5 +42,3 @@ startApp mbtilesfile startBrowser = do
                 else print "Failed to start browser"
         else
             action
-        where
-            action = Wai.run 8765 $ debug $ Servant.serve Routes.api (Controller.server spatialConns)
