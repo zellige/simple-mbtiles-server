@@ -27,7 +27,7 @@ tilesDB ::
   Int ->
   Int ->
   Text.Text ->
-  Servant.Handler BS.ByteString
+  Servant.Handler (Servant.Headers '[Servant.Header "Content-Encoding" Text.Text] BS.ByteString)
 tilesDB conns z x stringY
   | (".mvt" `Text.isSuffixOf` stringY) || (".pbf" `Text.isSuffixOf` stringY) || (".vector.pbf" `Text.isSuffixOf` stringY) =
     getAnything conns z x stringY
@@ -38,7 +38,7 @@ getAnything ::
   Int ->
   Int ->
   Text.Text ->
-  Servant.Handler BS.ByteString
+  Servant.Handler (Servant.Headers '[Servant.Header "Content-Encoding" Text.Text] BS.ByteString)
 getAnything conns z x stringY =
   case getY stringY of
     Left e -> Servant.throwError $ Servant.err400 {Servant.errBody = "Unknown request: " <> ByteStringLazyChar8.fromStrict (TextEncoding.encodeUtf8 stringY)}
@@ -46,12 +46,12 @@ getAnything conns z x stringY =
   where
     getY s = TextRead.decimal $ Text.takeWhile Char.isNumber s
 
-getTile :: Mbtiles.MbtilesPool -> Int -> Int -> Int -> Servant.Handler BS.ByteString
+getTile :: Mbtiles.MbtilesPool -> Int -> Int -> Int -> Servant.Handler (Servant.Headers '[Servant.Header "Content-Encoding" Text.Text] BS.ByteString)
 getTile conns z x y = do
   res <- MonadTrans.liftIO $ action
   case res of
     Just a ->
-      return a
+      return (Servant.addHeader "gzip" a)
     Nothing -> do
       Servant.throwError Servant.err404 {Servant.errBody = Errors.errorString "404" "No tiles found" "Try requesting a different tile."}
   where
