@@ -12,6 +12,7 @@ import qualified System.Exit as SystemExit
 import qualified Data.Text as Text
 import qualified Routes
 import qualified Controller
+import qualified DB (getTileEncoding)
 
 debug :: Wai.Middleware
 debug app req resp = do
@@ -31,6 +32,8 @@ startApp mbtilesfile startBrowser = do
       putStrLn $ show e
       SystemExit.exitWith (SystemExit.ExitFailure 2)
     Right spatialConns -> do
+        contentEncoding <- DB.getTileEncoding spatialConns
+        putStrLn $ show contentEncoding
         if startBrowser then do
             b <- Browser.openBrowser $ Text.unpack "http://127.0.0.1" ++ ":" ++ "8765"
             if b
@@ -40,4 +43,3 @@ startApp mbtilesfile startBrowser = do
             action
         where
             action = Wai.run 8765 $ debug $ Servant.serve Routes.api (Controller.server spatialConns)
-

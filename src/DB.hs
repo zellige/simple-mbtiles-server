@@ -15,12 +15,35 @@ import qualified Data.Text.Read as TextRead
 import qualified Database.Mbtiles as Mbtiles
 import qualified Errors
 import qualified Servant
+import qualified Data.Maybe as Maybe
 
 metadataDB ::
   Mbtiles.MbtilesPool ->
     Servant.Handler (HashMap.HashMap Text.Text Text.Text)
 metadataDB conns =
   Mbtiles.runMbtilesPoolT conns Mbtiles.getMetadata
+
+getTileEncoding :: Mbtiles.MbtilesPool -> IO Text.Text
+getTileEncoding conns = do
+    metadata <- Mbtiles.runMbtilesPoolT conns Mbtiles.getMetadata
+    pure $ if pCOptionSet metadata then
+      "identity"
+    else
+      "gzip"
+
+pCOptionSet :: HashMap.HashMap Text.Text Text.Text -> Bool
+pCOptionSet metadata =
+  Maybe.maybe False lastGeneratorPc (HashMap.lookup "generator_options" metadata)
+
+lastGeneratorPc :: Text.Text -> Bool
+lastGeneratorPc genOpts =
+  case a of
+    x:_ ->
+      last a
+    _ ->
+      False
+  where
+    a = map (Text.isInfixOf "-pC") (Text.splitOn ";" genOpts)
 
 tilesDB ::
   Mbtiles.MbtilesPool ->
@@ -51,9 +74,10 @@ getTile conns z x y = do
   res <- MonadTrans.liftIO $ action
   case res of
     Just a ->
-      return (Servant.addHeader "gzip" a)
+      return (Servant.addHeader contentEncoding a)
     Nothing -> do
       Servant.throwError Servant.err404 {Servant.errBody = Errors.errorString "404" "No tiles found" "Try requesting a different tile."}
   where
     action =
       Mbtiles.runMbtilesPoolT conns (Mbtiles.getTile (Mbtiles.Z z) (Mbtiles.X x) (Mbtiles.Y y))
+    contentEncoding = "gzip"
