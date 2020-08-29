@@ -16,7 +16,7 @@ type API ="tiles"
     :> Capture "z" Int
     :> Capture "x" Int
     :> Capture "y" Text.Text
-    :> Get '[OctetStream] BSS.ByteString
+    :> Get '[OctetStream] (Headers '[Header "Content-Encoding" Text.Text] BSS.ByteString)
     :<|> "metadata"
     :> Get '[JSON] (HashMap.HashMap Text.Text Text.Text)
     :<|> Raw

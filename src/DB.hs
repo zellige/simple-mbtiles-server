@@ -15,6 +15,8 @@ import qualified Data.Text.Read as TextRead
 import qualified Database.Mbtiles as Mbtiles
 import qualified Errors
 import qualified Servant
+import qualified Data.Maybe as Maybe
+import qualified Types.Config as Config
 
 metadataDB ::
   Mbtiles.MbtilesPool ->
@@ -22,15 +24,38 @@ metadataDB ::
 metadataDB conns =
   Mbtiles.runMbtilesPoolT conns Mbtiles.getMetadata
 
+getTileEncoding :: Mbtiles.MbtilesPool -> IO Config.ContentEncoding
+getTileEncoding conns = do
+    metadata <- Mbtiles.runMbtilesPoolT conns Mbtiles.getMetadata
+    pure $ if pCOptionSet metadata then
+      "identity"
+    else
+      "gzip"
+
+pCOptionSet :: HashMap.HashMap Text.Text Text.Text -> Bool
+pCOptionSet metadata =
+  Maybe.maybe False lastGeneratorPc (HashMap.lookup "generator_options" metadata)
+
+lastGeneratorPc :: Text.Text -> Bool
+lastGeneratorPc genOpts =
+  case a of
+    x:_ ->
+      last a
+    _ ->
+      False
+  where
+    a = map (Text.isInfixOf "-pC") (Text.splitOn ";" genOpts)
+
 tilesDB ::
+  Config.ContentEncoding ->
   Mbtiles.MbtilesPool ->
   Int ->
   Int ->
   Text.Text ->
-  Servant.Handler BS.ByteString
-tilesDB conns z x stringY
+  Servant.Handler (Servant.Headers '[Servant.Header "Content-Encoding" Text.Text] BS.ByteString)
+tilesDB contentEncoding conns z x stringY
   | (".mvt" `Text.isSuffixOf` stringY) || (".pbf" `Text.isSuffixOf` stringY) || (".vector.pbf" `Text.isSuffixOf` stringY) =
-    getAnything conns z x stringY
+    Servant.addHeader contentEncoding <$> (getAnything conns z x stringY)
   | otherwise = Servant.throwError $ Servant.err400 {Servant.errBody = "Unknown request: " <> ByteStringLazyChar8.fromStrict (TextEncoding.encodeUtf8 stringY)}
 
 getAnything ::

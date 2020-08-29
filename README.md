@@ -30,3 +30,9 @@ stack exec -- simple-mbtiles-server --mbtilesFile your_mbtiles_file.mbtiles -b
 
 ## Code formating
 Use Ormolu: <https://github.com/tweag/ormolu>
+
+### Content Encoding
+
+By default, Tippecanoe produces gzipped tiles. This causes a `Unimplimented type: 3` error if the content-encoding header on the response is not set correctly.
+
+Simple mbtiles uses the "generator_opts" field in the tile metadata to determine whether the last generator command included the -pC option to produce uncompressed tiles (see Tippecanoe readme for explanation). If if did, it will set content encoding to "identity" or uncompressed. Otherwise, it will set "gzip" as the content encoding.
