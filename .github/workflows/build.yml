@@ -15,9 +15,6 @@ jobs:
     - name: Get code
       uses: actions/checkout@v2
     
-    - name: Setup Stack
-      uses: mstksg/setup-stack@v2
-    
     - name: Cache Stack downloads
       uses: actions/cache@v1
       env:
@@ -63,9 +60,6 @@ jobs:
     - name: Get code
       uses: actions/checkout@v2
     
-    - name: Setup Stack
-      uses: mstksg/setup-stack@v2
-    
     - name: Cache Stack downloads
       uses: actions/cache@v1
       env:
@@ -110,9 +104,6 @@ jobs:
     steps:
     - name: Get code
       uses: actions/checkout@v2
-    
-    - name: Setup Stack
-      uses: mstksg/setup-stack@v2
     
     - name: Cache Stack downloads
       uses: actions/cache@v1
