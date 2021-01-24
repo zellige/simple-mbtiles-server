@@ -1,36 +1,32 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE QuasiQuotes #-}
-
 module DB where
 
 import qualified Control.Monad.Trans as MonadTrans (liftIO)
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy.Char8 as ByteStringLazyChar8
-
-import qualified Data.HashMap.Strict as HashMap
 import qualified Data.Char as Char
+import qualified Data.HashMap.Strict as HashMap
+import qualified Data.Maybe as Maybe
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as TextEncoding
 import qualified Data.Text.Read as TextRead
 import qualified Database.Mbtiles as Mbtiles
 import qualified Errors
 import qualified Servant
-import qualified Data.Maybe as Maybe
 import qualified Types.Config as Config
 
 metadataDB ::
   Mbtiles.MbtilesPool ->
-    Servant.Handler (HashMap.HashMap Text.Text Text.Text)
+  Servant.Handler (HashMap.HashMap Text.Text Text.Text)
 metadataDB conns =
   Mbtiles.runMbtilesPoolT conns Mbtiles.getMetadata
 
 getTileEncoding :: Mbtiles.MbtilesPool -> IO Config.ContentEncoding
 getTileEncoding conns = do
-    metadata <- Mbtiles.runMbtilesPoolT conns Mbtiles.getMetadata
-    pure $ if pCOptionSet metadata then
-      "identity"
-    else
-      "gzip"
+  metadata <- Mbtiles.runMbtilesPoolT conns Mbtiles.getMetadata
+  pure $
+    if pCOptionSet metadata
+      then "identity"
+      else "gzip"
 
 pCOptionSet :: HashMap.HashMap Text.Text Text.Text -> Bool
 pCOptionSet metadata =
@@ -39,7 +35,7 @@ pCOptionSet metadata =
 lastGeneratorPc :: Text.Text -> Bool
 lastGeneratorPc genOpts =
   case a of
-    x:_ ->
+    x : _ ->
       last a
     _ ->
       False

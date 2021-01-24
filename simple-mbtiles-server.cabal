@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 390b1cf458280d03439a8a3655d009bb8c7514c6a6fd2ad59fdc65876df2fa3f
+-- hash: ff7f547d2fc5597a5c39ce8b1d5da2e624c70b5629310c2fcd6515c2be6c279f
 
 name:           simple-mbtiles-server
-version:        0.0.1.0
+version:        0.0.2.0
 description:    Please see the README on GitHub at <https://github.com/zellige/simple-mbtiles-server#readme>
 homepage:       https://github.com/zellige/simple-mbtiles-server#readme
 bug-reports:    https://github.com/zellige/simple-mbtiles-server/issues
